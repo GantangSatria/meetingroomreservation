@@ -23,7 +23,7 @@ func NewApp(cfg *config.Config) *App {
 		log.Fatal("failed to connect database:", err)
 	}
 
-	if err := db.AutoMigrate(&models.User{} /*, &models.Room{}, &models.Reservation{}, &models.CheckIn{} */); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Room{} /*, &models.Reservation{}, &models.CheckIn{} */); err != nil {
     log.Fatal("migration failed:", err)
 }
 

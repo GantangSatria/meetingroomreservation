@@ -19,10 +19,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 	r := gin.Default()
 
 	userRepo := repository.NewUserRepository(db)
-
 	userSvc := services.NewUserService(userRepo, cfg.JWTSecret)
-
 	userCtrl := controller.NewUserController(userSvc)
+
+	roomRepo := repository.NewRoomRepository(db)
+	roomService := services.NewRoomService(roomRepo)
+	roomController := controller.NewRoomController(roomService)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
@@ -40,7 +42,17 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 			{
 				users.GET("/", userCtrl.GetAll)
 			}
+
+			rooms := protected.Group("/rooms")
+				rooms.POST("/", roomController.Create)
+				rooms.PUT("/:id", roomController.Update)
+				rooms.DELETE("/:id", roomController.Delete)
 		}
+		
+		roomsPublic := api.Group("/rooms")
+		roomsPublic.GET("/", roomController.GetAll)
+		roomsPublic.GET("/:id", roomController.GetByID)
+		
 	}
 
 	return &Router{Engine: r}
