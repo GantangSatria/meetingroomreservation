@@ -17,6 +17,9 @@ type ReservationService interface {
 	Update(id uint64, req *dto.UpdateReservationRequest) error
 	Delete(id uint64) error
 	GetQRCode(id uint64) ([]byte, error)
+
+	ApproveReservation(id uint64) error
+	RejectReservation(id uint64) error
 }
 
 type reservationService struct {
@@ -153,4 +156,32 @@ func toReservationResponse(res *models.Reservation) *dto.ReservationResponse {
 		CreatedAt: res.CreatedAt,
 		UpdatedAt: res.UpdatedAt,
 	}
+}
+
+func (s *reservationService) ApproveReservation(id uint64) error {
+	res, err := s.repo.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	if res.Status != "pending" {
+		return errors.New("only pending reservations can be approved")
+	}
+
+	res.Status = "approved"
+	return s.repo.Update(res)
+}
+
+func (s *reservationService) RejectReservation(id uint64) error {
+	res, err := s.repo.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	if res.Status != "pending" {
+		return errors.New("only pending reservations can be rejected")
+	}
+
+	res.Status = "rejected"
+	return s.repo.Update(res)
 }

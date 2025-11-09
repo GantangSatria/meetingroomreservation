@@ -49,6 +49,12 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 
 		c.Set("user_id", userID)
 
+		role, ok := claims["role"].(string)
+		if !ok {
+			role = "user"
+		}
+		c.Set("role", role)
+
 		c.Next()
 	}
 }

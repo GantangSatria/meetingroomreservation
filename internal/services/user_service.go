@@ -56,7 +56,7 @@ func (s *userService) Login(req *dto.LoginRequest) (string, error) {
 		return "", errors.New("invalid email or password")
 	}
 
-	token, err := utils.GenerateToken(user.ID, s.jwtSecret)
+	token, err := utils.GenerateToken(user.ID, user.Role, s.jwtSecret)
 	if err != nil {
 		return "", err
 	}

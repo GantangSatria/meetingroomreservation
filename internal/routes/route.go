@@ -59,6 +59,13 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 				reservations.DELETE("/:id", reservationController.Delete)
 				reservations.GET("/:id/qrcode", reservationController.GetQRCode)
 			}
+
+			admin := protected.Group("/admin")
+			admin.Use(middleware.AdminOnlyMiddleware())
+			{
+				admin.PUT("/reservations/:id/approve", reservationController.Approve)
+				admin.PUT("/reservations/:id/reject", reservationController.Reject)
+			}
 		}
 
 		roomsPublic := api.Group("/rooms")
@@ -68,6 +75,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 		reservationsPublic := api.Group("/reservations")
 		reservationsPublic.GET("/", reservationController.GetAll)
 		reservationsPublic.GET("/:id", reservationController.GetByID)
+		
 		
 	}
 

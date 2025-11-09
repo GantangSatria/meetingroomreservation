@@ -107,3 +107,39 @@ func (ctrl *ReservationController) GetQRCode(c *gin.Context) {
 	c.Header("Content-Type", "image/png")
 	c.Writer.Write(qrBytes)
 }
+
+func (ctrl *ReservationController) Approve(c *gin.Context) {
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "only admin can approve reservations"})
+		return
+	}
+
+	idStr := c.Param("id")
+	id, _ := strconv.ParseUint(idStr, 10, 64)
+
+	if err := ctrl.svc.ApproveReservation(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "reservation approved"})
+}
+
+func (ctrl *ReservationController) Reject(c *gin.Context) {
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "only admin can reject reservations"})
+		return
+	}
+
+	idStr := c.Param("id")
+	id, _ := strconv.ParseUint(idStr, 10, 64)
+
+	if err := ctrl.svc.RejectReservation(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "reservation rejected"})
+}
