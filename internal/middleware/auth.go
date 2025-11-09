@@ -31,13 +31,24 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 			return
 		}
 
-		if idRaw, ok := claims["id"]; ok {
-			c.Set("user_id", idRaw)
-			c.Next()
+		idRaw, ok := claims["id"]
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token payload"})
+			c.Abort()
 			return
 		}
 
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token payload"})
-		c.Abort()
+		idFloat, ok := idRaw.(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user id type"})
+			c.Abort()
+			return
+		}
+
+		userID := uint64(idFloat)
+
+		c.Set("user_id", userID)
+
+		c.Next()
 	}
 }

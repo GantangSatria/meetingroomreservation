@@ -26,6 +26,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 	roomService := services.NewRoomService(roomRepo)
 	roomController := controller.NewRoomController(roomService)
 
+	reservationRepo := repository.NewReservationRepository(db)
+	reservationService := services.NewReservationService(reservationRepo)
+	reservationController := controller.NewReservationController(reservationService)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
@@ -47,11 +51,23 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 				rooms.POST("/", roomController.Create)
 				rooms.PUT("/:id", roomController.Update)
 				rooms.DELETE("/:id", roomController.Delete)
+
+			reservations := protected.Group("/reservations")
+			{
+				reservations.POST("/", reservationController.Create)
+				reservations.PUT("/:id", reservationController.Update)
+				reservations.DELETE("/:id", reservationController.Delete)
+				reservations.GET("/:id/qrcode", reservationController.GetQRCode)
+			}
 		}
-		
+
 		roomsPublic := api.Group("/rooms")
 		roomsPublic.GET("/", roomController.GetAll)
 		roomsPublic.GET("/:id", roomController.GetByID)
+
+		reservationsPublic := api.Group("/reservations")
+		reservationsPublic.GET("/", reservationController.GetAll)
+		reservationsPublic.GET("/:id", reservationController.GetByID)
 		
 	}
 
