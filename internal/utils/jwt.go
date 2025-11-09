@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateToken(userID uint, secret string) (string, error) {
+func GenerateToken(userID uint64, secret string) (string, error) {
 	claims := jwt.MapClaims{
 		"id":  userID,
 		"exp": time.Now().Add(24 * time.Hour).Unix(),

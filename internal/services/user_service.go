@@ -9,7 +9,7 @@ import (
 )
 
 type UserService interface {
-	Register(req *dto.RegisterRequest) (uint, error)
+	Register(req *dto.RegisterRequest) (uint64, error)
 	Login(req *dto.LoginRequest) (string, error)
 	GetAll() ([]models.User, error)
 	GetByID(id uint) (*models.User, error)
@@ -24,7 +24,7 @@ func NewUserService(r repository.UserRepository, jwtSecret string) UserService {
 	return &userService{repo: r, jwtSecret: jwtSecret}
 }
 
-func (s *userService) Register(req *dto.RegisterRequest) (uint, error) {
+func (s *userService) Register(req *dto.RegisterRequest) (uint64, error) {
 	if _, err := s.repo.FindByEmail(req.Email); err == nil {
 		return 0, errors.New("email already registered")
 	}
