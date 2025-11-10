@@ -51,11 +51,6 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 				users.GET("/", userCtrl.GetAll)
 			}
 
-			rooms := protected.Group("/rooms")
-				rooms.POST("/", roomController.Create)
-				rooms.PUT("/:id", roomController.Update)
-				rooms.DELETE("/:id", roomController.Delete)
-
 			reservations := protected.Group("/reservations")
 			{
 				reservations.POST("/", reservationController.Create)
@@ -76,6 +71,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 			{
 				admin.PUT("/reservations/:id/approve", reservationController.Approve)
 				admin.PUT("/reservations/:id/reject", reservationController.Reject)
+				
+				rooms := admin.Group("/rooms")
+				rooms.POST("/", roomController.Create)
+				rooms.PUT("/:id", roomController.Update)
+				rooms.DELETE("/:id", roomController.Delete)
 			}
 		}
 
