@@ -14,6 +14,7 @@ type ReservationRepository interface {
 	Update(res *models.Reservation) error
 	Delete(id uint64) error
 	IsTimeConflict(roomID uint64, start, end time.Time) (bool, error)
+	FindByUserRoomAndStartTime(userID uint64, roomID uint64, startTime time.Time) (*models.Reservation, error)
 }
 
 type reservationRepository struct {
@@ -61,3 +62,13 @@ func (r *reservationRepository) IsTimeConflict(roomID uint64, start, end time.Ti
 
 	return count > 0, err
 }
+
+func (r *reservationRepository) FindByUserRoomAndStartTime(userID, roomID uint64, startTime time.Time) (*models.Reservation, error) {
+	var reservation models.Reservation
+	err := r.db.Where("user_id = ? AND room_id = ? AND start_time = ?", userID, roomID, startTime).First(&reservation).Error
+	if err != nil {
+		return nil, err
+	}
+	return &reservation, nil
+}
+

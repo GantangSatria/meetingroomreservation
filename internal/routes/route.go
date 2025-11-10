@@ -30,6 +30,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 	reservationService := services.NewReservationService(reservationRepo)
 	reservationController := controller.NewReservationController(reservationService)
 
+	checkinRepo := repository.NewCheckinRepository(db)
+	checkinService := services.NewCheckinService(checkinRepo, reservationRepo)
+	checkinController := controller.NewCheckinController(checkinService)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
@@ -58,6 +62,13 @@ func Setup(db *gorm.DB, cfg *config.Config) *Router {
 				reservations.PUT("/:id", reservationController.Update)
 				reservations.DELETE("/:id", reservationController.Delete)
 				reservations.GET("/:id/qrcode", reservationController.GetQRCode)
+			}
+
+			checkins := protected.Group("/checkin")
+			{
+				checkins.POST("/:reservation_id", checkinController.Checkin)
+				checkins.POST("/:reservation_id/checkout", checkinController.Checkout)
+				checkins.POST("/qrcode", checkinController.CheckinByQRCode)
 			}
 
 			admin := protected.Group("/admin")

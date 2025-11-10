@@ -48,7 +48,7 @@ func (s *reservationService) Create(req *dto.CreateReservationRequest, userID ui
 		Status:    "pending",
 	}
 
-	qrData := fmt.Sprintf("reservation:%d:%d:%s", req.RoomID, userID, req.StartTime.String())
+	qrData := fmt.Sprintf("reservation:%d:%d:%s", userID, req.RoomID, req.StartTime.String())
 	qr, err := utils.GenerateQRCode(qrData)
 	if err != nil {
 		return nil, err
