@@ -2,7 +2,7 @@ app = "meeting-room-reservation-satria"
 primary_region = "sin"
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = "dockerfile"
 
 [env]
   PORT = "8080"
